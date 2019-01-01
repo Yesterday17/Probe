@@ -3,6 +3,8 @@ package cn.yesterday17.probe;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.minecraft.client.resources.I18n;
+import net.minecraftforge.fml.common.FMLModContainer;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
@@ -10,8 +12,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import org.apache.logging.log4j.Logger;
 
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 
 @Mod(
         modid = Probe.MOD_ID,
@@ -38,6 +39,13 @@ public class Probe
 
     @EventHandler
     public void onLoadComplete(FMLLoadCompleteEvent event) {
+        // Mods
+        Loader.instance().getIndexedModList().forEach((modid, container)->{
+            if(container instanceof FMLModContainer){
+                rcFile.Mods.add(container.getMetadata());
+            }
+        });
+
         // Items
         ForgeRegistries.ITEMS.getEntries().forEach((entry)->{
             ZSRCFile.ItemEntry item = new ZSRCFile.ItemEntry();
@@ -48,11 +56,14 @@ public class Probe
             rcFile.Items.add(item);
         });
 
+
         // Write to .zsrc
         try {
-            FileWriter rcFileWriter = new FileWriter("./scripts/.zsrc");
-            gson.toJson(rcFile, rcFileWriter);
-            rcFileWriter.close();
+            BufferedWriter rcBufferedWriter = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream("./scripts/.zsrc"), "UTF-8"
+            ));
+            gson.toJson(rcFile, rcBufferedWriter);
+            rcBufferedWriter.close();
         }
         catch (IOException e) {
             logger.error(e.getMessage());
