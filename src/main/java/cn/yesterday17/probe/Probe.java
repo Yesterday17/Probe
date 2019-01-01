@@ -1,8 +1,11 @@
 package cn.yesterday17.probe;
 
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.minecraft.client.resources.I18n;
+import net.minecraftforge.common.ForgeVersion;
 import net.minecraftforge.fml.common.FMLModContainer;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -12,7 +15,11 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import org.apache.logging.log4j.Logger;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 
 @Mod(
         modid = Probe.MOD_ID,
@@ -21,33 +28,47 @@ import java.io.*;
         clientSideOnly = true,
         dependencies = "required-after:crafttweaker"
 )
-public class Probe
-{
+public class Probe {
     static final String MOD_ID = "probe";
     static final String NAME = "Probe";
     static final String VERSION = "1.0.0";
 
     private static Logger logger;
-    private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static Gson gson = new GsonBuilder().addSerializationExclusionStrategy(new ExclusionStrategy() {
+        @Override
+        public boolean shouldSkipField(FieldAttributes f) {
+            return f.getName().equals("requiredMods")
+                    || f.getName().equals("dependencies")
+                    || f.getName().equals("dependants");
+        }
+
+        @Override
+        public boolean shouldSkipClass(Class<?> clazz) {
+            return false;
+        }
+    }).setPrettyPrinting().create();
     private static ZSRCFile rcFile = new ZSRCFile();
 
     @EventHandler
-    public void preInit(FMLPreInitializationEvent event)
-    {
+    public void preInit(FMLPreInitializationEvent event) {
         logger = event.getModLog();
     }
 
     @EventHandler
     public void onLoadComplete(FMLLoadCompleteEvent event) {
+        // Version
+        rcFile.mcVersion = ForgeVersion.mcVersion;
+        rcFile.forgeVersion = ForgeVersion.getVersion();
+
         // Mods
-        Loader.instance().getIndexedModList().forEach((modid, container)->{
-            if(container instanceof FMLModContainer){
+        Loader.instance().getIndexedModList().forEach((modid, container) -> {
+            if (container instanceof FMLModContainer) {
                 rcFile.Mods.add(container.getMetadata());
             }
         });
 
         // Items
-        ForgeRegistries.ITEMS.getEntries().forEach((entry)->{
+        ForgeRegistries.ITEMS.getEntries().forEach((entry) -> {
             ZSRCFile.ItemEntry item = new ZSRCFile.ItemEntry();
             item.domain = entry.getKey().getResourceDomain();
             item.path = entry.getKey().getResourcePath();
@@ -56,16 +77,14 @@ public class Probe
             rcFile.Items.add(item);
         });
 
-
         // Write to .zsrc
         try {
             BufferedWriter rcBufferedWriter = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream("./scripts/.zsrc"), "UTF-8"
+                    new FileOutputStream("./scripts/.zsrc"), StandardCharsets.UTF_8
             ));
             gson.toJson(rcFile, rcBufferedWriter);
             rcBufferedWriter.close();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
