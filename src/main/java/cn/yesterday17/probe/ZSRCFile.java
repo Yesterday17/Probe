@@ -59,8 +59,8 @@ public class ZSRCFile {
     }
 
     static class EnchantmentEntry extends BaseEntry{
-        Enchantment.Rarity rarity;
-        EnumEnchantmentType type;
+        String rarity;
+        String type;
 
         EnchantmentEntry(ResourceLocation resourceLocation) {
             super(resourceLocation);

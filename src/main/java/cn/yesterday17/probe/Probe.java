@@ -78,8 +78,8 @@ public class Probe {
         ForgeRegistries.ENCHANTMENTS.getEntries().forEach((entry)->{
             ZSRCFile.EnchantmentEntry enchantment = new ZSRCFile.EnchantmentEntry(entry.getKey());
             enchantment.setUnlocalizedName(entry.getValue().getName());
-            enchantment.rarity = entry.getValue().getRarity();
-            enchantment.type = entry.getValue().type;
+            enchantment.rarity = entry.getValue().getRarity().toString();
+            enchantment.type = entry.getValue().type.toString();
             rcFile.Enchantments.add(enchantment);
         });
 
@@ -90,6 +90,9 @@ public class Probe {
 
             rcFile.Entities.add(entity);
         });
+
+        // Liquids
+
 
         // Write to .zsrc
         try {
