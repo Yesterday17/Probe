@@ -4,7 +4,6 @@ import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.minecraft.client.resources.I18n;
 import net.minecraftforge.common.ForgeVersion;
 import net.minecraftforge.fml.common.FMLModContainer;
 import net.minecraftforge.fml.common.Loader;
@@ -101,7 +100,9 @@ public class Probe {
             ));
             gson.toJson(rcFile, rcBufferedWriter);
             rcBufferedWriter.close();
-        } catch (IOException e) {
+            logger.info("Probe loaded successfully!");
+        } catch (Exception e) {
+            logger.error("Probe met an error while loading! Please report to author about the problem!");
             logger.error(e.getMessage());
         }
     }
