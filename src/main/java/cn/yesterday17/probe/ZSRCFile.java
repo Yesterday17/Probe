@@ -1,8 +1,10 @@
 package cn.yesterday17.probe;
 
 import com.google.gson.annotations.SerializedName;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.ModMetadata;
 
 import java.util.HashSet;
@@ -21,15 +23,61 @@ public class ZSRCFile {
     @SerializedName("enchantments")
     Set<EnchantmentEntry> Enchantments = new HashSet<>();
 
-    static class ItemEntry {
+    @SerializedName("entities")
+    Set<EntityEntry> Entities = new HashSet<>();
+
+    static class BaseEntry {
         String domain;
         String path;
         String unlocalizedName;
         String localizedName;
+
+        BaseEntry(ResourceLocation resourceLocation) {
+            this.domain = resourceLocation.getResourceDomain();
+            this.path = resourceLocation.getResourcePath();
+        }
+
+        void setUnlocalizedName(String unlocalizedName, String pre, String post) {
+            this.unlocalizedName = unlocalizedName;
+            this.localizedName = I18n.format(pre + this.unlocalizedName + post);
+        }
+
+        void setUnlocalizedName(String unlocalizedName, String post) {
+            this.setUnlocalizedName(unlocalizedName, "", post);
+        }
+
+        void setUnlocalizedName(String unlocalizedName) {
+            this.setUnlocalizedName(unlocalizedName, "", "");
+        }
+
     }
 
-    static class EnchantmentEntry extends ItemEntry{
+    static class ItemEntry extends BaseEntry{
+        ItemEntry(ResourceLocation resourceLocation) {
+            super(resourceLocation);
+        }
+    }
+
+    static class EnchantmentEntry extends BaseEntry{
         Enchantment.Rarity rarity;
         EnumEnchantmentType type;
+
+        EnchantmentEntry(ResourceLocation resourceLocation) {
+            super(resourceLocation);
+        }
+    }
+
+    static class EntityEntry extends BaseEntry {
+        private transient String unlocalizedName;
+
+        EntityEntry(ResourceLocation resourceLocation){
+            super(resourceLocation);
+        }
+
+        @Override
+        void setUnlocalizedName(String unlocalizedName, String pre, String post) {
+            this.unlocalizedName = unlocalizedName;
+            this.localizedName = unlocalizedName;
+        }
     }
 }

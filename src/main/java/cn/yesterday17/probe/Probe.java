@@ -69,24 +69,26 @@ public class Probe {
 
         // Items
         ForgeRegistries.ITEMS.getEntries().forEach((entry) -> {
-            ZSRCFile.ItemEntry item = new ZSRCFile.ItemEntry();
-            item.domain = entry.getKey().getResourceDomain();
-            item.path = entry.getKey().getResourcePath();
-            item.unlocalizedName = entry.getValue().getUnlocalizedName();
-            item.localizedName = I18n.format(item.unlocalizedName + ".name");
+            ZSRCFile.ItemEntry item = new ZSRCFile.ItemEntry(entry.getKey());
+            item.setUnlocalizedName(entry.getValue().getUnlocalizedName(), ".name");
             rcFile.Items.add(item);
         });
 
+        // Enchantments
         ForgeRegistries.ENCHANTMENTS.getEntries().forEach((entry)->{
-            ZSRCFile.EnchantmentEntry enchantment = new ZSRCFile.EnchantmentEntry();
-            enchantment.domain = entry.getKey().getResourceDomain();
-            enchantment.path = entry.getKey().getResourcePath();
-            enchantment.unlocalizedName = entry.getValue().getName();
-            enchantment.localizedName = I18n.format(enchantment.unlocalizedName);
-
+            ZSRCFile.EnchantmentEntry enchantment = new ZSRCFile.EnchantmentEntry(entry.getKey());
+            enchantment.setUnlocalizedName(entry.getValue().getName());
             enchantment.rarity = entry.getValue().getRarity();
             enchantment.type = entry.getValue().type;
             rcFile.Enchantments.add(enchantment);
+        });
+
+        // Entities
+        ForgeRegistries.ENTITIES.getEntries().forEach((entry)->{
+            ZSRCFile.EntityEntry entity = new ZSRCFile.EntityEntry(entry.getKey());
+            entity.setUnlocalizedName(entry.getValue().getName());
+
+            rcFile.Entities.add(entity);
         });
 
         // Write to .zsrc
