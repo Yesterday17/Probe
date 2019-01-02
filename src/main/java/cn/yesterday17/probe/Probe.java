@@ -77,6 +77,18 @@ public class Probe {
             rcFile.Items.add(item);
         });
 
+        ForgeRegistries.ENCHANTMENTS.getEntries().forEach((entry)->{
+            ZSRCFile.EnchantmentEntry enchantment = new ZSRCFile.EnchantmentEntry();
+            enchantment.domain = entry.getKey().getResourceDomain();
+            enchantment.path = entry.getKey().getResourcePath();
+            enchantment.unlocalizedName = entry.getValue().getName();
+            enchantment.localizedName = I18n.format(enchantment.unlocalizedName);
+
+            enchantment.rarity = entry.getValue().getRarity();
+            enchantment.type = entry.getValue().type;
+            rcFile.Enchantments.add(enchantment);
+        });
+
         // Write to .zsrc
         try {
             BufferedWriter rcBufferedWriter = new BufferedWriter(new OutputStreamWriter(

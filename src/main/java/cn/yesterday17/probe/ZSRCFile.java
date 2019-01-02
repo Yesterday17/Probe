@@ -1,6 +1,8 @@
 package cn.yesterday17.probe;
 
 import com.google.gson.annotations.SerializedName;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraftforge.fml.common.ModMetadata;
 
 import java.util.HashSet;
@@ -16,10 +18,18 @@ public class ZSRCFile {
     @SerializedName("items")
     Set<ItemEntry> Items = new HashSet<>();
 
+    @SerializedName("enchantments")
+    Set<EnchantmentEntry> Enchantments = new HashSet<>();
+
     static class ItemEntry {
         String domain;
         String path;
         String unlocalizedName;
         String localizedName;
+    }
+
+    static class EnchantmentEntry extends ItemEntry{
+        Enchantment.Rarity rarity;
+        EnumEnchantmentType type;
     }
 }
