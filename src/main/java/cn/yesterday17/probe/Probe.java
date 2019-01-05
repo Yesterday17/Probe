@@ -1,6 +1,8 @@
 package cn.yesterday17.probe;
 
+import cn.yesterday17.probe.serializer.ArtifactVersionSerializer;
 import cn.yesterday17.probe.serializer.FluidSerializer;
+import cn.yesterday17.probe.serializer.ModSerializer;
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
@@ -12,9 +14,11 @@ import net.minecraftforge.fml.common.FMLModContainer;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.ModMetadata;
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.fml.common.versioning.ArtifactVersion;
 import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedWriter;
@@ -36,20 +40,9 @@ public class Probe {
 
     private static Logger logger;
     private static Gson gson = new GsonBuilder()
+            .registerTypeAdapter(ArtifactVersion.class, new ArtifactVersionSerializer())
+            .registerTypeAdapter(ModMetadata.class, new ModSerializer())
             .registerTypeAdapter(Fluid.class, new FluidSerializer())
-            .addSerializationExclusionStrategy(new ExclusionStrategy() {
-        @Override
-        public boolean shouldSkipField(FieldAttributes f) {
-            return f.getName().equals("requiredMods")
-                    || f.getName().equals("dependencies")
-                    || f.getName().equals("dependants");
-        }
-
-        @Override
-        public boolean shouldSkipClass(Class<?> clazz) {
-            return false;
-        }
-    })
             .serializeNulls()
             .setPrettyPrinting()
             .create();
