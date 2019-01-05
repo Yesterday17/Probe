@@ -1,10 +1,13 @@
 package cn.yesterday17.probe;
 
+import cn.yesterday17.probe.serializer.FluidSerializer;
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.minecraftforge.common.ForgeVersion;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.FMLModContainer;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -16,7 +19,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 
@@ -33,7 +35,9 @@ public class Probe {
     static final String VERSION = "1.0.0";
 
     private static Logger logger;
-    private static Gson gson = new GsonBuilder().addSerializationExclusionStrategy(new ExclusionStrategy() {
+    private static Gson gson = new GsonBuilder()
+            .registerTypeAdapter(Fluid.class, new FluidSerializer())
+            .addSerializationExclusionStrategy(new ExclusionStrategy() {
         @Override
         public boolean shouldSkipField(FieldAttributes f) {
             return f.getName().equals("requiredMods")
@@ -45,7 +49,10 @@ public class Probe {
         public boolean shouldSkipClass(Class<?> clazz) {
             return false;
         }
-    }).setPrettyPrinting().create();
+    })
+            .serializeNulls()
+            .setPrettyPrinting()
+            .create();
     private static ZSRCFile rcFile = new ZSRCFile();
 
     @EventHandler
@@ -91,7 +98,7 @@ public class Probe {
         });
 
         // Liquids
-
+        rcFile.Fluids.addAll(FluidRegistry.getRegisteredFluids().values());
 
         // Write to .zsrc
         try {
