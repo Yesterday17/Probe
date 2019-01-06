@@ -1,12 +1,10 @@
 package cn.yesterday17.probe;
 
-import cn.yesterday17.probe.serializer.ArtifactVersionSerializer;
-import cn.yesterday17.probe.serializer.FluidSerializer;
-import cn.yesterday17.probe.serializer.ModSerializer;
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.FieldAttributes;
+import cn.yesterday17.probe.serializer.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeVersion;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -41,10 +39,11 @@ public class Probe {
     private static Logger logger;
     private static Gson gson = new GsonBuilder()
             .registerTypeAdapter(ArtifactVersion.class, new ArtifactVersionSerializer())
+            .registerTypeAdapter(ResourceLocation.class, new ResourceLocationSerializer())
             .registerTypeAdapter(ModMetadata.class, new ModSerializer())
+            .registerTypeHierarchyAdapter(Item.class, new ItemSerializer())
             .registerTypeAdapter(Fluid.class, new FluidSerializer())
-            .serializeNulls()
-            .setPrettyPrinting()
+            .serializeNulls().setPrettyPrinting()
             .create();
     private static ZSRCFile rcFile = new ZSRCFile();
 
@@ -67,11 +66,7 @@ public class Probe {
         });
 
         // Items
-        ForgeRegistries.ITEMS.getEntries().forEach((entry) -> {
-            ZSRCFile.ItemEntry item = new ZSRCFile.ItemEntry(entry.getKey());
-            item.setUnlocalizedName(entry.getValue().getUnlocalizedName(), ".name");
-            rcFile.Items.add(item);
-        });
+        rcFile.Items.addAll(ForgeRegistries.ITEMS.getValuesCollection());
 
         // Enchantments
         ForgeRegistries.ENCHANTMENTS.getEntries().forEach((entry)->{

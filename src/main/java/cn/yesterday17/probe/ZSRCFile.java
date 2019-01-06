@@ -3,6 +3,7 @@ package cn.yesterday17.probe;
 import cn.yesterday17.probe.serializer.ZSRCSerializer;
 import com.google.gson.annotations.JsonAdapter;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.common.ModMetadata;
@@ -17,7 +18,7 @@ public class ZSRCFile {
 
     Set<ModMetadata> Mods = new HashSet<>();
 
-    Set<ItemEntry> Items = new HashSet<>();
+    Set<Item> Items = new HashSet<>();
 
     Set<EnchantmentEntry> Enchantments = new HashSet<>();
 
@@ -37,7 +38,7 @@ public class ZSRCFile {
         return Mods;
     }
 
-    public Set<ItemEntry> getItems() {
+    public Set<Item> getItems() {
         return Items;
     }
 
