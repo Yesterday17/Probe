@@ -3,6 +3,7 @@ package cn.yesterday17.probe;
 import cn.yesterday17.probe.serializer.ZSRCSerializer;
 import com.google.gson.annotations.JsonAdapter;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.Fluid;
@@ -20,7 +21,7 @@ public class ZSRCFile {
 
     Set<Item> Items = new HashSet<>();
 
-    Set<EnchantmentEntry> Enchantments = new HashSet<>();
+    Set<Enchantment> Enchantments = new HashSet<>();
 
     Set<EntityEntry> Entities = new HashSet<>();
 
@@ -42,7 +43,7 @@ public class ZSRCFile {
         return Items;
     }
 
-    public Set<EnchantmentEntry> getEnchantments() {
+    public Set<Enchantment> getEnchantments() {
         return Enchantments;
     }
 
@@ -70,29 +71,10 @@ public class ZSRCFile {
             this.localizedName = I18n.format(pre + this.unlocalizedName + post);
         }
 
-        void setUnlocalizedName(String unlocalizedName, String post) {
-            this.setUnlocalizedName(unlocalizedName, "", post);
-        }
-
         void setUnlocalizedName(String unlocalizedName) {
             this.setUnlocalizedName(unlocalizedName, "", "");
         }
 
-    }
-
-    static class ItemEntry extends BaseEntry{
-        ItemEntry(ResourceLocation resourceLocation) {
-            super(resourceLocation);
-        }
-    }
-
-    static class EnchantmentEntry extends BaseEntry{
-        String rarity;
-        String type;
-
-        EnchantmentEntry(ResourceLocation resourceLocation) {
-            super(resourceLocation);
-        }
     }
 
     static class EntityEntry extends BaseEntry {

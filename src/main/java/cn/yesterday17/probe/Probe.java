@@ -3,6 +3,7 @@ package cn.yesterday17.probe;
 import cn.yesterday17.probe.serializer.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeVersion;
@@ -42,7 +43,8 @@ public class Probe {
             .registerTypeAdapter(ResourceLocation.class, new ResourceLocationSerializer())
             .registerTypeAdapter(ModMetadata.class, new ModSerializer())
             .registerTypeHierarchyAdapter(Item.class, new ItemSerializer())
-            .registerTypeAdapter(Fluid.class, new FluidSerializer())
+            .registerTypeHierarchyAdapter(Enchantment.class, new EnchantmentSerializer())
+            .registerTypeHierarchyAdapter(Fluid.class, new FluidSerializer())
             .serializeNulls().setPrettyPrinting()
             .create();
     private static ZSRCFile rcFile = new ZSRCFile();
@@ -69,13 +71,7 @@ public class Probe {
         rcFile.Items.addAll(ForgeRegistries.ITEMS.getValuesCollection());
 
         // Enchantments
-        ForgeRegistries.ENCHANTMENTS.getEntries().forEach((entry)->{
-            ZSRCFile.EnchantmentEntry enchantment = new ZSRCFile.EnchantmentEntry(entry.getKey());
-            enchantment.setUnlocalizedName(entry.getValue().getName());
-            enchantment.rarity = entry.getValue().getRarity().toString();
-            enchantment.type = entry.getValue().type.toString();
-            rcFile.Enchantments.add(enchantment);
-        });
+        rcFile.Enchantments.addAll(ForgeRegistries.ENCHANTMENTS.getValuesCollection());
 
         // Entities
         ForgeRegistries.ENTITIES.getEntries().forEach((entry)->{
