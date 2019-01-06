@@ -2,12 +2,11 @@ package cn.yesterday17.probe;
 
 import cn.yesterday17.probe.serializer.ZSRCSerializer;
 import com.google.gson.annotations.JsonAdapter;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.common.ModMetadata;
+import net.minecraftforge.fml.common.registry.EntityEntry;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -53,41 +52,5 @@ public class ZSRCFile {
 
     public Set<Fluid> getFluids() {
         return Fluids;
-    }
-
-    static class BaseEntry {
-        String domain;
-        String path;
-        String unlocalizedName;
-        String localizedName;
-
-        BaseEntry(ResourceLocation resourceLocation) {
-            this.domain = resourceLocation.getResourceDomain();
-            this.path = resourceLocation.getResourcePath();
-        }
-
-        void setUnlocalizedName(String unlocalizedName, String pre, String post) {
-            this.unlocalizedName = unlocalizedName;
-            this.localizedName = I18n.format(pre + this.unlocalizedName + post);
-        }
-
-        void setUnlocalizedName(String unlocalizedName) {
-            this.setUnlocalizedName(unlocalizedName, "", "");
-        }
-
-    }
-
-    static class EntityEntry extends BaseEntry {
-        private transient String unlocalizedName;
-
-        EntityEntry(ResourceLocation resourceLocation){
-            super(resourceLocation);
-        }
-
-        @Override
-        void setUnlocalizedName(String unlocalizedName, String pre, String post) {
-            this.unlocalizedName = unlocalizedName;
-            this.localizedName = unlocalizedName;
-        }
     }
 }

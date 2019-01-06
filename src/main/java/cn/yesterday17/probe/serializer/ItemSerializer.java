@@ -6,6 +6,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
 import java.lang.reflect.Type;
@@ -19,14 +20,15 @@ public class ItemSerializer implements JsonSerializer<Item> {
         item.addProperty("name", ("" + I18n.format(src.getUnlocalizedName() + ".name")).trim());
         item.addProperty("unlocalizedName", src.getUnlocalizedName());
         item.add("resourceLocation", context.serialize(Item.REGISTRY.getNameForObject(src), ResourceLocation.class));
-        item.addProperty("maxStackSize", src.getItemStackLimit());
-        item.addProperty("maxDamage", src.getMaxDamage());
+        item.addProperty("maxStackSize", new ItemStack(src).getMaxStackSize());
+        item.addProperty("maxDamage", new ItemStack(src).getMaxDamage());
         item.addProperty("bFull3D", src.isFull3D());
         item.addProperty("hasSubtypes", src.getHasSubtypes());
         item.addProperty("canRepair", src.isRepairable());
 
         item.add("containerItem", context.serialize(src.getContainerItem()));
         item.add("tabToDisplayOn", context.serialize(src.getCreativeTab()));
+
         return item;
     }
 }

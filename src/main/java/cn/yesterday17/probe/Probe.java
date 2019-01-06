@@ -16,6 +16,7 @@ import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.ModMetadata;
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.versioning.ArtifactVersion;
 import org.apache.logging.log4j.Logger;
@@ -44,6 +45,7 @@ public class Probe {
             .registerTypeAdapter(ModMetadata.class, new ModSerializer())
             .registerTypeHierarchyAdapter(Item.class, new ItemSerializer())
             .registerTypeHierarchyAdapter(Enchantment.class, new EnchantmentSerializer())
+            .registerTypeHierarchyAdapter(EntityEntry.class, new EntitySerializer())
             .registerTypeHierarchyAdapter(Fluid.class, new FluidSerializer())
             .serializeNulls().setPrettyPrinting()
             .create();
@@ -56,32 +58,16 @@ public class Probe {
 
     @EventHandler
     public void onLoadComplete(FMLLoadCompleteEvent event) {
-        // Version
         rcFile.mcVersion = ForgeVersion.mcVersion;
         rcFile.forgeVersion = ForgeVersion.getVersion();
-
-        // Mods
         Loader.instance().getIndexedModList().forEach((modid, container) -> {
             if (container instanceof FMLModContainer) {
                 rcFile.Mods.add(container.getMetadata());
             }
         });
-
-        // Items
         rcFile.Items.addAll(ForgeRegistries.ITEMS.getValuesCollection());
-
-        // Enchantments
         rcFile.Enchantments.addAll(ForgeRegistries.ENCHANTMENTS.getValuesCollection());
-
-        // Entities
-        ForgeRegistries.ENTITIES.getEntries().forEach((entry)->{
-            ZSRCFile.EntityEntry entity = new ZSRCFile.EntityEntry(entry.getKey());
-            entity.setUnlocalizedName(entry.getValue().getName());
-
-            rcFile.Entities.add(entity);
-        });
-
-        // Liquids
+        rcFile.Entities.addAll(ForgeRegistries.ENTITIES.getValuesCollection());
         rcFile.Fluids.addAll(FluidRegistry.getRegisteredFluids().values());
 
         // Write to .zsrc
