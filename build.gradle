@@ -11,7 +11,7 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: "maven"
 
-version = "0.1.14"
+version = "0.1.15"
 group = "cn.yesterday17"
 archivesBaseName = "probe"
 

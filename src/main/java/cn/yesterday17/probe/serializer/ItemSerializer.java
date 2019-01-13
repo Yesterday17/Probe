@@ -26,8 +26,8 @@ public class ItemSerializer implements JsonSerializer<Item> {
         item.addProperty("hasSubtypes", src.getHasSubtypes());
         item.addProperty("canRepair", src.isRepairable());
 
-        item.add("containerItem", context.serialize(src.getContainerItem() == null ? null : src.getContainerItem().getRegistryName()));
-        item.add("tabToDisplayOn", context.serialize(src.getCreativeTab()));
+        item.addProperty("containerItem", src.getContainerItem() == null ? null : Item.getIdFromItem(src.getContainerItem()));
+        item.add("tabToDisplayOn", context.serialize(src.getCreativeTab() == null ? null : src.getCreativeTab().getTabIndex()));
 
         return item;
     }
