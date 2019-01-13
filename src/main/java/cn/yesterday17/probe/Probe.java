@@ -3,6 +3,7 @@ package cn.yesterday17.probe;
 import cn.yesterday17.probe.serializer.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
@@ -42,6 +43,7 @@ public class Probe {
     private static Gson gson = new GsonBuilder()
             .registerTypeAdapter(ArtifactVersion.class, new ArtifactVersionSerializer())
             .registerTypeAdapter(ResourceLocation.class, new ResourceLocationSerializer())
+            .registerTypeHierarchyAdapter(CreativeTabs.class, new CreativeTabSerializer())
             .registerTypeAdapter(ModMetadata.class, new ModSerializer())
             .registerTypeHierarchyAdapter(Item.class, new ItemSerializer())
             .registerTypeHierarchyAdapter(Enchantment.class, new EnchantmentSerializer())
@@ -80,7 +82,7 @@ public class Probe {
             logger.info("Probe loaded successfully!");
         } catch (Exception e) {
             logger.error("Probe met an error while loading! Please report to author about the problem!");
-            logger.error(e.getMessage());
+            logger.error(e, e);
         }
     }
 }
