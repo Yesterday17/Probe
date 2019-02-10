@@ -15,6 +15,7 @@ import java.util.Set;
 public class ZSRCFile {
     String mcVersion;
     String forgeVersion;
+    String probeVersion;
 
     Set<ModMetadata> Mods = new HashSet<>();
 
@@ -32,6 +33,10 @@ public class ZSRCFile {
 
     public String getForgeVersion() {
         return forgeVersion;
+    }
+
+    public String getProbeVersion() {
+        return probeVersion;
     }
 
     public Set<ModMetadata> getMods() {

@@ -16,6 +16,7 @@ public class ZSRCSerializer implements JsonSerializer<ZSRCFile> {
 
         zsrc.add("mcVersion", context.serialize((src.getMcVersion())));
         zsrc.add("forgeVersion", context.serialize(src.getForgeVersion()));
+        zsrc.add("probeVersion", context.serialize((src.getProbeVersion())));
 
         zsrc.add("mods", context.serialize(src.getMods()));
 

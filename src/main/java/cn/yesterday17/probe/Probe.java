@@ -37,7 +37,7 @@ import java.nio.charset.StandardCharsets;
 public class Probe {
     static final String MOD_ID = "probe";
     static final String NAME = "Probe";
-    static final String VERSION = "1.0.0";
+    static final String VERSION = "0.1.16";
 
     private static Logger logger;
     private static Gson gson = new GsonBuilder()
@@ -62,6 +62,7 @@ public class Probe {
     public void onLoadComplete(FMLLoadCompleteEvent event) {
         rcFile.mcVersion = ForgeVersion.mcVersion;
         rcFile.forgeVersion = ForgeVersion.getVersion();
+        rcFile.probeVersion = VERSION;
         Loader.instance().getIndexedModList().forEach((modid, container) -> {
             if (container instanceof FMLModContainer) {
                 rcFile.Mods.add(container.getMetadata());
