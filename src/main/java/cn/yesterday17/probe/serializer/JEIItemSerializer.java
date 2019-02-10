@@ -9,7 +9,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
 
 public class JEIItemSerializer implements JsonSerializer<IIngredientListElement> {
     @Override
@@ -20,8 +19,7 @@ public class JEIItemSerializer implements JsonSerializer<IIngredientListElement>
         ingredient.addProperty("name", src.getDisplayName());
         ingredient.addProperty("unlocalizedName", stack.getUnlocalizedName());
         ingredient.addProperty("modName", src.getModNameForSorting());
-        ingredient.add("resourceLocation", context.serialize(
-                new ResourceLocation((String) src.getModNameStrings().iterator().next(), src.getResourceId()), ResourceLocation.class));
+        ingredient.add("resourceLocation", context.serialize(stack.getItem().getRegistryName(), ResourceLocation.class));
         ingredient.addProperty("metadata", stack.getMetadata());
 
         ingredient.addProperty("maxStackSize", stack.getMaxStackSize());
