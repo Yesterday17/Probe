@@ -2,14 +2,14 @@ package cn.yesterday17.probe;
 
 import cn.yesterday17.probe.serializer.ZSRCSerializer;
 import com.google.gson.annotations.JsonAdapter;
+import mezz.jei.gui.ingredients.IIngredientListElement;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.common.ModMetadata;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @JsonAdapter(ZSRCSerializer.class)
 public class ZSRCFile {
@@ -19,6 +19,9 @@ public class ZSRCFile {
 
     Set<ModMetadata> Mods = new HashSet<>();
 
+    List<IIngredientListElement> JEIItems = new ArrayList<>();
+
+    @Deprecated
     Set<Item> Items = new HashSet<>();
 
     Set<Enchantment> Enchantments = new HashSet<>();
@@ -43,6 +46,11 @@ public class ZSRCFile {
         return Mods;
     }
 
+    public List<IIngredientListElement> getJEIItems() {
+        return JEIItems;
+    }
+
+    @Deprecated
     public Set<Item> getItems() {
         return Items;
     }

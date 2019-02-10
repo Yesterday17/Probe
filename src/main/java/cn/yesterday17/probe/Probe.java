@@ -3,9 +3,12 @@ package cn.yesterday17.probe;
 import cn.yesterday17.probe.serializer.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import mezz.jei.Internal;
+import mezz.jei.gui.ingredients.IIngredientListElement;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeVersion;
 import net.minecraftforge.fluids.Fluid;
@@ -32,7 +35,8 @@ import java.nio.charset.StandardCharsets;
         name = Probe.NAME,
         version = Probe.VERSION,
         clientSideOnly = true,
-        dependencies = "required-after:crafttweaker"
+        dependencies = "required-after:crafttweaker" + ";" +
+                "required-after:jei" + ";"
 )
 public class Probe {
     static final String MOD_ID = "probe";
@@ -45,7 +49,8 @@ public class Probe {
             .registerTypeAdapter(ResourceLocation.class, new ResourceLocationSerializer())
             .registerTypeHierarchyAdapter(CreativeTabs.class, new CreativeTabSerializer())
             .registerTypeAdapter(ModMetadata.class, new ModSerializer())
-            .registerTypeHierarchyAdapter(Item.class, new ItemSerializer())
+            // .registerTypeHierarchyAdapter(Item.class, new ItemSerializer())
+            .registerTypeHierarchyAdapter(IIngredientListElement.class, new JEIItemSerializer())
             .registerTypeHierarchyAdapter(Enchantment.class, new EnchantmentSerializer())
             .registerTypeHierarchyAdapter(EntityEntry.class, new EntitySerializer())
             .registerTypeHierarchyAdapter(Fluid.class, new FluidSerializer())
@@ -63,14 +68,30 @@ public class Probe {
         rcFile.mcVersion = ForgeVersion.mcVersion;
         rcFile.forgeVersion = ForgeVersion.getVersion();
         rcFile.probeVersion = VERSION;
+
+        // Mods
         Loader.instance().getIndexedModList().forEach((modid, container) -> {
             if (container instanceof FMLModContainer) {
                 rcFile.Mods.add(container.getMetadata());
             }
         });
-        rcFile.Items.addAll(ForgeRegistries.ITEMS.getValuesCollection());
+
+        // Items
+        Internal.getRuntime().getIngredientFilter().getIngredientList().forEach((element -> {
+            if (element.getIngredient() instanceof ItemStack) {
+                rcFile.JEIItems.add(element);
+            }
+        }));
+        // remain for compatibility
+        // rcFile.Items.addAll(ForgeRegistries.ITEMS.getValuesCollection());
+
+        // Enchantments
         rcFile.Enchantments.addAll(ForgeRegistries.ENCHANTMENTS.getValuesCollection());
+
+        // Entities
         rcFile.Entities.addAll(ForgeRegistries.ENTITIES.getValuesCollection());
+
+        // Fluids
         rcFile.Fluids.addAll(FluidRegistry.getRegisteredFluids().values());
 
         // Write to .zsrc

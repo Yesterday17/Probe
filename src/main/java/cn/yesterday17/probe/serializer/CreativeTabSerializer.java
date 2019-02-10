@@ -13,7 +13,6 @@ public class CreativeTabSerializer implements JsonSerializer<CreativeTabs> {
     @Override
     public JsonElement serialize(CreativeTabs src, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject tab = new JsonObject();
-        tab.addProperty("index", src.getTabIndex());
         tab.addProperty("label", src.getTabLabel());
         tab.addProperty("translatedLabel", src.getTranslatedTabLabel());
         tab.addProperty("hasSearchBar", src.hasSearchBar());

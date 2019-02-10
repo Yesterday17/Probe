@@ -2,8 +2,8 @@ package cn.yesterday17.probe.serializer;
 
 import cn.yesterday17.probe.ZSRCFile;
 import com.google.gson.*;
+import mezz.jei.gui.ingredients.IIngredientListElement;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.item.Item;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 
@@ -20,8 +20,10 @@ public class ZSRCSerializer implements JsonSerializer<ZSRCFile> {
 
         zsrc.add("mods", context.serialize(src.getMods()));
 
+        // Items
         JsonArray items = new JsonArray();
-        src.getItems().forEach(item -> items.add(context.serialize(item, Item.class)));
+        // src.getItems().forEach(item -> items.add(context.serialize(item, Item.class)));
+        src.getJEIItems().forEach(item -> items.add(context.serialize(item, IIngredientListElement.class)));
         zsrc.add("items", items);
 
         JsonArray enchantments = new JsonArray();

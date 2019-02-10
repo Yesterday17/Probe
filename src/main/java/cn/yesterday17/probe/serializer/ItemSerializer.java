@@ -11,6 +11,7 @@ import net.minecraft.util.ResourceLocation;
 
 import java.lang.reflect.Type;
 
+@Deprecated
 public class ItemSerializer implements JsonSerializer<Item> {
     @Override
     public JsonElement serialize(Item src, Type typeOfSrc, JsonSerializationContext context) {
