@@ -38,6 +38,8 @@ public class ZSRCSerializer implements JsonSerializer<ZSRCFile> {
         src.getFluids().forEach(fluid -> fluids.add(context.serialize(fluid, Fluid.class)));
         zsrc.add("fluids", fluids);
 
+        zsrc.add("oredictionary", context.serialize(src.getOreDictionary()));
+
         return zsrc;
     }
 }

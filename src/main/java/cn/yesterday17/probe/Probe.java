@@ -7,7 +7,6 @@ import mezz.jei.Internal;
 import mezz.jei.gui.ingredients.IIngredientListElement;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeVersion;
@@ -23,12 +22,14 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.versioning.ArtifactVersion;
+import net.minecraftforge.oredict.OreDictionary;
 import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 
 @Mod(
         modid = Probe.MOD_ID,
@@ -41,7 +42,7 @@ import java.nio.charset.StandardCharsets;
 public class Probe {
     static final String MOD_ID = "probe";
     static final String NAME = "Probe";
-    static final String VERSION = "0.1.16";
+    static final String VERSION = "0.1.17";
 
     private static Logger logger;
     private static Gson gson = new GsonBuilder()
@@ -54,7 +55,8 @@ public class Probe {
             .registerTypeHierarchyAdapter(Enchantment.class, new EnchantmentSerializer())
             .registerTypeHierarchyAdapter(EntityEntry.class, new EntitySerializer())
             .registerTypeHierarchyAdapter(Fluid.class, new FluidSerializer())
-            .serializeNulls().setPrettyPrinting()
+            .serializeNulls()
+            // .setPrettyPrinting()
             .create();
     private static ZSRCFile rcFile = new ZSRCFile();
 
@@ -93,6 +95,9 @@ public class Probe {
 
         // Fluids
         rcFile.Fluids.addAll(FluidRegistry.getRegisteredFluids().values());
+
+        // OreDictionary
+        Collections.addAll(rcFile.OreDictionary, OreDictionary.getOreNames());
 
         // Write to .zsrc
         try {

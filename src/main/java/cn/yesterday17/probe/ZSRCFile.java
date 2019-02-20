@@ -30,6 +30,8 @@ public class ZSRCFile {
 
     Set<Fluid> Fluids = new HashSet<>();
 
+    Set<String> OreDictionary = new HashSet<>();
+
     public String getMcVersion() {
         return mcVersion;
     }
@@ -65,5 +67,9 @@ public class ZSRCFile {
 
     public Set<Fluid> getFluids() {
         return Fluids;
+    }
+
+    public Set<String> getOreDictionary() {
+        return OreDictionary;
     }
 }
