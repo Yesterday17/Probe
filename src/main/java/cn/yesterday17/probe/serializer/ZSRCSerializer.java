@@ -6,6 +6,7 @@ import com.google.gson.*;
 import mezz.jei.gui.ingredients.IIngredientListElement;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 
 import java.lang.reflect.Type;
@@ -29,8 +30,12 @@ public class ZSRCSerializer implements JsonSerializer<ZSRCFile> {
         config.addProperty("oredictionary", ProbeConfig.enableOreDictionary);
         zsrc.add("config", config);
 
-        if (ProbeConfig.enableMods)
-            zsrc.add("mods", context.serialize(src.getMods()));
+        // Mods
+        JsonArray mods = new JsonArray();
+        if (ProbeConfig.enableMods) {
+            src.getMods().forEach(mod -> mods.add(context.serialize(mod, ModContainer.class)));
+        }
+        zsrc.add("mods", mods);
 
         // Items
         JsonArray items = new JsonArray();

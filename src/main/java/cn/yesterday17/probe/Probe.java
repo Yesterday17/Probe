@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.FMLModContainer;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.ModMetadata;
+import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.EntityEntry;
@@ -42,14 +42,14 @@ import java.util.Collections;
 public class Probe {
     static final String MOD_ID = "probe";
     static final String NAME = "Probe";
-    static final String VERSION = "0.1.17";
+    static final String VERSION = "0.1.20";
 
     public static Logger logger;
     private static Gson gson = new GsonBuilder()
-            .registerTypeAdapter(ArtifactVersion.class, new ArtifactVersionSerializer())
-            .registerTypeAdapter(ResourceLocation.class, new ResourceLocationSerializer())
+            .registerTypeHierarchyAdapter(ArtifactVersion.class, new ArtifactVersionSerializer())
+            .registerTypeHierarchyAdapter(ResourceLocation.class, new ResourceLocationSerializer())
             .registerTypeHierarchyAdapter(CreativeTabs.class, new CreativeTabSerializer())
-            .registerTypeAdapter(ModMetadata.class, new ModSerializer())
+            .registerTypeHierarchyAdapter(ModContainer.class, new ModSerializer())
             // .registerTypeHierarchyAdapter(Item.class, new ItemSerializer())
             .registerTypeHierarchyAdapter(IIngredientListElement.class, new JEIItemSerializer())
             .registerTypeHierarchyAdapter(Enchantment.class, new EnchantmentSerializer())
@@ -74,7 +74,7 @@ public class Probe {
         // Mods
         Loader.instance().getIndexedModList().forEach((modid, container) -> {
             if (container instanceof FMLModContainer) {
-                rcFile.Mods.add(container.getMetadata());
+                rcFile.Mods.add(container);
             }
         });
 

@@ -6,7 +6,7 @@ import mezz.jei.gui.ingredients.IIngredientListElement;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fml.common.ModMetadata;
+import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ public class ZSRCFile {
     String forgeVersion;
     String probeVersion;
 
-    Set<ModMetadata> Mods = new HashSet<>();
+    Set<ModContainer> Mods = new HashSet<>();
 
     List<IIngredientListElement> JEIItems = new ArrayList<>();
 
@@ -47,7 +47,7 @@ public class ZSRCFile {
         return probeVersion;
     }
 
-    public Set<ModMetadata> getMods() {
+    public Set<ModContainer> getMods() {
         return Mods;
     }
 
