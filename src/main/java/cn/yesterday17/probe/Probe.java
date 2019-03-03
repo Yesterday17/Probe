@@ -44,7 +44,7 @@ public class Probe {
     static final String NAME = "Probe";
     static final String VERSION = "0.1.17";
 
-    private static Logger logger;
+    public static Logger logger;
     private static Gson gson = new GsonBuilder()
             .registerTypeAdapter(ArtifactVersion.class, new ArtifactVersionSerializer())
             .registerTypeAdapter(ResourceLocation.class, new ResourceLocationSerializer())

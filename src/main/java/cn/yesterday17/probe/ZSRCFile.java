@@ -9,7 +9,10 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.common.ModMetadata;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @JsonAdapter(ZSRCSerializer.class)
 public class ZSRCFile {

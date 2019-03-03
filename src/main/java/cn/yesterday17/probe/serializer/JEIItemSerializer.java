@@ -1,5 +1,6 @@
 package cn.yesterday17.probe.serializer;
 
+import cn.yesterday17.probe.Probe;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
@@ -16,17 +17,22 @@ public class JEIItemSerializer implements JsonSerializer<IIngredientListElement>
         JsonObject ingredient = new JsonObject();
         ItemStack stack = (ItemStack) src.getIngredient();
 
-        ingredient.addProperty("name", src.getDisplayName());
-        ingredient.addProperty("unlocalizedName", stack.getUnlocalizedName());
-        ingredient.addProperty("modName", src.getModNameForSorting());
-        ingredient.add("resourceLocation", context.serialize(stack.getItem().getRegistryName(), ResourceLocation.class));
-        ingredient.addProperty("metadata", stack.getMetadata());
+        try {
+            ingredient.addProperty("name", src.getDisplayName());
+            ingredient.addProperty("unlocalizedName", stack.getUnlocalizedName());
+            ingredient.addProperty("modName", src.getModNameForSorting());
+            ingredient.add("resourceLocation", context.serialize(stack.getItem().getRegistryName(), ResourceLocation.class));
+            ingredient.addProperty("metadata", stack.getMetadata());
 
-        ingredient.addProperty("maxStackSize", stack.getMaxStackSize());
-        ingredient.addProperty("maxDamage", stack.getMaxDamage());
-        ingredient.addProperty("canRepair", stack.getItem().isRepairable());
-        ingredient.add("tooltips", context.serialize(src.getTooltipStrings()));
-        ingredient.add("creativeTabStrings", context.serialize(src.getCreativeTabsStrings()));
+            ingredient.addProperty("maxStackSize", stack.getMaxStackSize());
+            ingredient.addProperty("maxDamage", stack.getMaxDamage());
+            ingredient.addProperty("canRepair", stack.getItem().isRepairable());
+            ingredient.add("tooltips", context.serialize(src.getTooltipStrings()));
+            ingredient.add("creativeTabStrings", context.serialize(src.getCreativeTabsStrings()));
+        } catch (Exception e) {
+            Probe.logger.error("Failed serializing JEIItems!");
+            Probe.logger.error(e, e);
+        }
 
         return ingredient;
     }
