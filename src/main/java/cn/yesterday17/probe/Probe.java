@@ -1,7 +1,6 @@
 package cn.yesterday17.probe;
 
 import cn.yesterday17.probe.serializer.*;
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import mezz.jei.Internal;
 import mezz.jei.gui.ingredients.IIngredientListElement;
@@ -42,10 +41,10 @@ import java.util.Collections;
 public class Probe {
     static final String MOD_ID = "probe";
     static final String NAME = "Probe";
-    static final String VERSION = "0.1.20";
+    static final String VERSION = "0.1.21";
 
     public static Logger logger;
-    private static Gson gson = new GsonBuilder()
+    private static GsonBuilder gson = new GsonBuilder()
             .registerTypeHierarchyAdapter(ArtifactVersion.class, new ArtifactVersionSerializer())
             .registerTypeHierarchyAdapter(ResourceLocation.class, new ResourceLocationSerializer())
             .registerTypeHierarchyAdapter(CreativeTabs.class, new CreativeTabSerializer())
@@ -55,9 +54,7 @@ public class Probe {
             .registerTypeHierarchyAdapter(Enchantment.class, new EnchantmentSerializer())
             .registerTypeHierarchyAdapter(EntityEntry.class, new EntitySerializer())
             .registerTypeHierarchyAdapter(Fluid.class, new FluidSerializer())
-            .serializeNulls()
-            // .setPrettyPrinting()
-            .create();
+            .serializeNulls();
     private static ZSRCFile rcFile = new ZSRCFile();
 
     @EventHandler
@@ -104,7 +101,9 @@ public class Probe {
             BufferedWriter rcBufferedWriter = new BufferedWriter(new OutputStreamWriter(
                     new FileOutputStream("./scripts/.zsrc"), StandardCharsets.UTF_8
             ));
-            gson.toJson(rcFile, rcBufferedWriter);
+            if (ProbeConfig.setPrettyPrinting)
+                gson.setPrettyPrinting();
+            gson.create().toJson(rcFile, rcBufferedWriter);
             rcBufferedWriter.close();
             logger.info("Probe loaded successfully!");
         } catch (Exception e) {

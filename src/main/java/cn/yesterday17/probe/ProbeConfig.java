@@ -21,4 +21,7 @@ public class ProbeConfig {
 
     @Config.RequiresMcRestart
     public static boolean enableOreDictionary = true;
+
+    @Config.RequiresMcRestart
+    public static boolean setPrettyPrinting = false;
 }
