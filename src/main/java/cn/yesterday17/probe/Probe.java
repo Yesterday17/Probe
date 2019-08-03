@@ -71,7 +71,6 @@ public class Probe {
             .registerTypeHierarchyAdapter(IJavaMethod.class, new MethodSerializer())
             .registerTypeHierarchyAdapter(ZenType.class, new ZenTypeSerializer())
 
-            .setPrettyPrinting()
             .serializeNulls();
     private static ZSRCFile rcFile = new ZSRCFile();
 
@@ -144,7 +143,7 @@ public class Probe {
                 result.addAll(recursive((SymbolPackage) symbol));
             else if (symbol instanceof SymbolType) if
             (((SymbolType) symbol).getType() != null)
-                result.add((ZenType) ((SymbolType) symbol).getType());
+                result.add(((SymbolType) symbol).getType());
         });
 
         return result;
