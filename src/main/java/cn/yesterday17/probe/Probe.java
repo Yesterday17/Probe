@@ -1,7 +1,10 @@
 package cn.yesterday17.probe;
 
 import cn.yesterday17.probe.serializer.*;
+import cn.yesterday17.probe.serializer.CTRegistries.MethodSerializer;
+import cn.yesterday17.probe.serializer.CTRegistries.ZenTypeSerializer;
 import com.google.gson.GsonBuilder;
+import crafttweaker.zenscript.GlobalRegistry;
 import mezz.jei.Internal;
 import mezz.jei.gui.ingredients.IIngredientListElement;
 import net.minecraft.creativetab.CreativeTabs;
@@ -23,12 +26,23 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.versioning.ArtifactVersion;
 import net.minecraftforge.oredict.OreDictionary;
 import org.apache.logging.log4j.Logger;
+import stanhebben.zenscript.dump.IDumpable;
+import stanhebben.zenscript.dump.types.DumpDummy;
+import stanhebben.zenscript.symbols.IZenSymbol;
+import stanhebben.zenscript.symbols.SymbolPackage;
+import stanhebben.zenscript.symbols.SymbolType;
+import stanhebben.zenscript.type.ZenType;
+import stanhebben.zenscript.type.ZenTypeNative;
+import stanhebben.zenscript.type.natives.IJavaMethod;
 
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @Mod(
         modid = Probe.MOD_ID,
@@ -54,6 +68,10 @@ public class Probe {
             .registerTypeHierarchyAdapter(Enchantment.class, new EnchantmentSerializer())
             .registerTypeHierarchyAdapter(EntityEntry.class, new EntitySerializer())
             .registerTypeHierarchyAdapter(Fluid.class, new FluidSerializer())
+            .registerTypeHierarchyAdapter(IJavaMethod.class, new MethodSerializer())
+            .registerTypeHierarchyAdapter(ZenType.class, new ZenTypeSerializer())
+
+            .setPrettyPrinting()
             .serializeNulls();
     private static ZSRCFile rcFile = new ZSRCFile();
 
@@ -96,6 +114,10 @@ public class Probe {
         // OreDictionary
         Collections.addAll(rcFile.OreDictionary, OreDictionary.getOreNames());
 
+
+        //Global Registries
+        rcFile.zenTypes.addAll(recursive(GlobalRegistry.getRoot()));
+
         // Write to .zsrc
         try {
             BufferedWriter rcBufferedWriter = new BufferedWriter(new OutputStreamWriter(
@@ -110,5 +132,21 @@ public class Probe {
             logger.error("Probe met an error while loading! Please report to author about the problem!");
             logger.error(e, e);
         }
+
+    }
+
+
+    private static List<ZenType> recursive(SymbolPackage primer) {
+        List<ZenType> result = new ArrayList<>();
+
+        primer.getPackages().forEach((str, symbol) -> {
+            if (symbol instanceof SymbolPackage)
+                result.addAll(recursive((SymbolPackage) symbol));
+            else if (symbol instanceof SymbolType) if
+            (((SymbolType) symbol).getType() != null)
+                result.add((ZenType) ((SymbolType) symbol).getType());
+        });
+
+        return result;
     }
 }

@@ -23,5 +23,9 @@ public class ProbeConfig {
     public static boolean enableOreDictionary = true;
 
     @Config.RequiresMcRestart
+    public static boolean enableRegistries = true;
+
+    @Config.RequiresMcRestart
     public static boolean setPrettyPrinting = false;
+
 }

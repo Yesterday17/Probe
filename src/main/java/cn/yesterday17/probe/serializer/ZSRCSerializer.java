@@ -8,6 +8,9 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.registry.EntityEntry;
+import stanhebben.zenscript.dump.types.DumpZenTypeNative;
+import stanhebben.zenscript.type.ZenType;
+import stanhebben.zenscript.type.ZenTypeNative;
 
 import java.lang.reflect.Type;
 
@@ -28,6 +31,7 @@ public class ZSRCSerializer implements JsonSerializer<ZSRCFile> {
         config.addProperty("entities", ProbeConfig.enableEntities);
         config.addProperty("fluids", ProbeConfig.enableFluids);
         config.addProperty("oredictionary", ProbeConfig.enableOreDictionary);
+        config.addProperty("registries", ProbeConfig.enableRegistries);
         zsrc.add("config", config);
 
         // Mods
@@ -70,6 +74,12 @@ public class ZSRCSerializer implements JsonSerializer<ZSRCFile> {
         if (ProbeConfig.enableOreDictionary)
             zsrc.add("oredictionary", context.serialize(src.getOreDictionary()));
 
+        //Global Registry
+        if (ProbeConfig.enableRegistries) {
+            JsonArray registries = new JsonArray();
+            src.getZenTypes().forEach(zentype -> registries.add(context.serialize(zentype, ZenType.class)));
+            zsrc.add("registries", registries);
+        }
         return zsrc;
     }
 }

@@ -8,6 +8,9 @@ import net.minecraft.item.Item;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.registry.EntityEntry;
+import stanhebben.zenscript.dump.types.DumpZenType;
+import stanhebben.zenscript.type.ZenType;
+import stanhebben.zenscript.type.ZenTypeNative;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -34,6 +37,8 @@ public class ZSRCFile {
     Set<Fluid> Fluids = new HashSet<>();
 
     Set<String> OreDictionary = new HashSet<>();
+
+    List<ZenType> zenTypes = new ArrayList<>();
 
     public String getMcVersion() {
         return mcVersion;
@@ -74,5 +79,9 @@ public class ZSRCFile {
 
     public Set<String> getOreDictionary() {
         return OreDictionary;
+    }
+
+    public List<ZenType> getZenTypes() {
+        return zenTypes;
     }
 }
