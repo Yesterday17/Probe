@@ -50,7 +50,7 @@ import java.util.List;
 public class Probe {
     static final String MOD_ID = "probe";
     static final String NAME = "Probe";
-    static final String VERSION = "0.1.21";
+    static final String VERSION = "0.1.22";
 
     public static Logger logger;
     private static GsonBuilder gson = new GsonBuilder()
