@@ -26,13 +26,9 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.versioning.ArtifactVersion;
 import net.minecraftforge.oredict.OreDictionary;
 import org.apache.logging.log4j.Logger;
-import stanhebben.zenscript.dump.IDumpable;
-import stanhebben.zenscript.dump.types.DumpDummy;
-import stanhebben.zenscript.symbols.IZenSymbol;
 import stanhebben.zenscript.symbols.SymbolPackage;
 import stanhebben.zenscript.symbols.SymbolType;
 import stanhebben.zenscript.type.ZenType;
-import stanhebben.zenscript.type.ZenTypeNative;
 import stanhebben.zenscript.type.natives.IJavaMethod;
 
 import java.io.BufferedWriter;
@@ -42,7 +38,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 @Mod(
         modid = Probe.MOD_ID,
@@ -63,7 +58,6 @@ public class Probe {
             .registerTypeHierarchyAdapter(ResourceLocation.class, new ResourceLocationSerializer())
             .registerTypeHierarchyAdapter(CreativeTabs.class, new CreativeTabSerializer())
             .registerTypeHierarchyAdapter(ModContainer.class, new ModSerializer())
-            // .registerTypeHierarchyAdapter(Item.class, new ItemSerializer())
             .registerTypeHierarchyAdapter(IIngredientListElement.class, new JEIItemSerializer())
             .registerTypeHierarchyAdapter(Enchantment.class, new EnchantmentSerializer())
             .registerTypeHierarchyAdapter(EntityEntry.class, new EntitySerializer())
@@ -93,13 +87,13 @@ public class Probe {
         });
 
         // Items
-        Internal.getRuntime().getIngredientFilter().getIngredientList().forEach((element -> {
-            if (element.getIngredient() instanceof ItemStack) {
-                rcFile.JEIItems.add(element);
-            }
-        }));
-        // remain for compatibility
-        // rcFile.Items.addAll(ForgeRegistries.ITEMS.getValuesCollection());
+        if (Internal.getRuntime() != null) {
+            Internal.getRuntime().getIngredientFilter().getIngredientList().forEach((element -> {
+                if (element.getIngredient() instanceof ItemStack) {
+                    rcFile.JEIItems.add(element);
+                }
+            }));
+        }
 
         // Enchantments
         rcFile.Enchantments.addAll(ForgeRegistries.ENCHANTMENTS.getValuesCollection());
@@ -113,9 +107,8 @@ public class Probe {
         // OreDictionary
         Collections.addAll(rcFile.OreDictionary, OreDictionary.getOreNames());
 
-
-        //Global Registries
-        rcFile.zenTypes.addAll(recursive(GlobalRegistry.getRoot()));
+        // Global Registries
+        rcFile.zenTypes.addAll(getZenTypes(GlobalRegistry.getRoot()));
 
         // Write to .zsrc
         try {
@@ -135,15 +128,15 @@ public class Probe {
     }
 
 
-    private static List<ZenType> recursive(SymbolPackage primer) {
+    private static List<ZenType> getZenTypes(SymbolPackage primer) {
         List<ZenType> result = new ArrayList<>();
 
         primer.getPackages().forEach((str, symbol) -> {
-            if (symbol instanceof SymbolPackage)
-                result.addAll(recursive((SymbolPackage) symbol));
-            else if (symbol instanceof SymbolType) if
-            (((SymbolType) symbol).getType() != null)
+            if (symbol instanceof SymbolPackage) {
+                result.addAll(getZenTypes((SymbolPackage) symbol));
+            } else if (symbol instanceof SymbolType && ((SymbolType) symbol).getType() != null) {
                 result.add(((SymbolType) symbol).getType());
+            }
         });
 
         return result;

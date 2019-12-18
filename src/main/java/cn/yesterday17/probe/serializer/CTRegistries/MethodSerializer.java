@@ -11,13 +11,13 @@ public class MethodSerializer implements JsonSerializer<IJavaMethod> {
     public JsonElement serialize(IJavaMethod src, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject method = new JsonObject();
 
-            JsonArray parameters = new JsonArray();
-            for (ZenType z:src.getParameterTypes()){
-                parameters.add(z.getName());
-            }
-            method.add("parameters", parameters);
+        JsonArray parameters = new JsonArray();
+        for (ZenType z : src.getParameterTypes()) {
+            parameters.add(z.getName());
+        }
+        method.add("params", parameters);
 
-        method.addProperty("returned", src.getReturnType().getName());
+        method.addProperty("return", src.getReturnType().getName());
         return method;
     }
 }

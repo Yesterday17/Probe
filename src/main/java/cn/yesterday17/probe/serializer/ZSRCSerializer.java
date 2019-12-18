@@ -8,9 +8,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.registry.EntityEntry;
-import stanhebben.zenscript.dump.types.DumpZenTypeNative;
 import stanhebben.zenscript.type.ZenType;
-import stanhebben.zenscript.type.ZenTypeNative;
 
 import java.lang.reflect.Type;
 
@@ -71,15 +69,18 @@ public class ZSRCSerializer implements JsonSerializer<ZSRCFile> {
         zsrc.add("fluids", fluids);
 
         // OreDictionary
-        if (ProbeConfig.enableOreDictionary)
-            zsrc.add("oredictionary", context.serialize(src.getOreDictionary()));
-
-        //Global Registry
-        if (ProbeConfig.enableRegistries) {
-            JsonArray registries = new JsonArray();
-            src.getZenTypes().forEach(zentype -> registries.add(context.serialize(zentype, ZenType.class)));
-            zsrc.add("registries", registries);
+        JsonArray oreDictionary = new JsonArray();
+        if (ProbeConfig.enableOreDictionary) {
+            src.getOreDictionary().forEach(od -> oreDictionary.add(context.serialize(od, String.class)));
         }
+        zsrc.add("oredictionary", oreDictionary);
+
+        // CraftTweaker Registries
+        JsonArray registries = new JsonArray();
+        if (ProbeConfig.enableRegistries) {
+            src.getZenTypes().forEach(zenType -> registries.add(context.serialize(zenType, ZenType.class)));
+        }
+        zsrc.add("registries", registries);
         return zsrc;
     }
 }

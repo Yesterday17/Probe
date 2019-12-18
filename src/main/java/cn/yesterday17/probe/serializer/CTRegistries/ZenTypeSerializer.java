@@ -4,84 +4,60 @@ import com.google.gson.*;
 import stanhebben.zenscript.type.ZenType;
 import stanhebben.zenscript.type.ZenTypeNative;
 import stanhebben.zenscript.type.natives.IJavaMethod;
+import stanhebben.zenscript.type.natives.ZenNativeMember;
 
 import java.lang.reflect.Type;
+import java.util.function.BiConsumer;
 
 public class ZenTypeSerializer implements JsonSerializer<ZenType> {
-
     @Override
     public JsonElement serialize(ZenType src, Type typeOfSrc, JsonSerializationContext context) {
+        JsonObject zenType = new JsonObject();
+        zenType.addProperty("zsName", src.getName());
 
-        //Base ZenType
-        JsonObject zentype = new JsonObject();
-        zentype.addProperty("zsName", src.getName());
-
-
-        if (src instanceof ZenTypeNative){
-            //Members JsonObject
+        if (src instanceof ZenTypeNative) {
             JsonObject membersJson = new JsonObject();
 
-            ((ZenTypeNative) src).getMembers().forEach((strname, member)-> {
-                JsonObject memberJson = new JsonObject();
+            // Members
+            ((ZenTypeNative) src).getMembers().forEach(getStringZenNativeMemberBiConsumer(context, membersJson, false));
 
-                //Get all callable of the method
-                if (!member.getMethods().isEmpty()){
-                    JsonArray methods = new JsonArray();
-                    member.getMethods().forEach((
-                            iJavaMethod ->
-                            methods.add(context.serialize(iJavaMethod, IJavaMethod.class))));
-                    memberJson.add("methods", methods);
-                }
+            // Static Members
+            ((ZenTypeNative) src).getStaticMembers().forEach(getStringZenNativeMemberBiConsumer(context, membersJson, true));
 
-
-                //Getter object
-                if (member.getGetter() != null){
-                    memberJson.addProperty("getter", member.getGetter().getReturnType().getName());
-                }
-
-                //Setter object
-                if (member.getSetter() != null){
-                    JsonArray setterTypes = new JsonArray();
-                    for (ZenType j : member.getSetter().getParameterTypes()){
-                        setterTypes.add(j.getName());
-                    }
-                    memberJson.add("setter", setterTypes);
-                }
-                membersJson.add(strname, memberJson);
-            });
-
-            //Static
-            ((ZenTypeNative) src).getStaticMembers().forEach((strname, member)-> {
-                JsonObject memberJson = new JsonObject();
-
-                //Get all callable of the method
-                if (!member.getMethods().isEmpty()){
-                    JsonArray methods = new JsonArray();
-                    member.getMethods().forEach((
-                            iJavaMethod ->
-                                    methods.add(context.serialize(iJavaMethod, IJavaMethod.class))));
-                    memberJson.add("methods", methods);
-                }
-
-
-                //Getter object
-                if (member.getGetter() != null){
-                    memberJson.addProperty("getter", member.getGetter().getReturnType().getName());
-                }
-
-                //Setter object
-                if (member.getSetter() != null){
-                    JsonArray setterTypes = new JsonArray();
-                    for (ZenType j : member.getSetter().getParameterTypes()){
-                        setterTypes.add(j.getName());
-                    }
-                    memberJson.add("setter", setterTypes);
-                }
-                membersJson.add(strname, memberJson);
-            });
-
-            zentype.add("members", membersJson);
+            zenType.add("members", membersJson);
         }
-        return zentype;
+        return zenType;
+    }
+
+    private BiConsumer<String, ZenNativeMember> getStringZenNativeMemberBiConsumer(JsonSerializationContext context, JsonObject members, boolean isStatic) {
+        return (name, member) -> {
+            JsonObject memberJson = new JsonObject();
+            memberJson.addProperty("static", isStatic);
+
+            // Get all callable of the method
+            if (!member.getMethods().isEmpty()) {
+                JsonArray methods = new JsonArray();
+                member.getMethods().forEach(
+                        method -> methods.add(context.serialize(method, IJavaMethod.class))
+                );
+                memberJson.add("methods", methods);
+            }
+
+            // Getter object
+            if (member.getGetter() != null) {
+                memberJson.addProperty("getter", member.getGetter().getReturnType().getName());
+            }
+
+            // Setter object
+            if (member.getSetter() != null) {
+                JsonArray setterTypes = new JsonArray();
+                for (ZenType j : member.getSetter().getParameterTypes()) {
+                    setterTypes.add(j.getName());
+                }
+                memberJson.add("setter", setterTypes);
+            }
+
+            members.add(name, memberJson);
+        };
     }
 }
