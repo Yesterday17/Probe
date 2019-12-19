@@ -8,14 +8,10 @@ import net.minecraft.item.Item;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.registry.EntityEntry;
-import stanhebben.zenscript.dump.types.DumpZenType;
 import stanhebben.zenscript.type.ZenType;
-import stanhebben.zenscript.type.ZenTypeNative;
+import stanhebben.zenscript.type.natives.IJavaMethod;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @JsonAdapter(ZSRCSerializer.class)
 public class ZSRCFile {
@@ -39,6 +35,12 @@ public class ZSRCFile {
     Set<String> OreDictionary = new HashSet<>();
 
     List<ZenType> zenTypes = new ArrayList<>();
+
+    Map<String, String> globalFields = new HashMap<>();
+
+    Map<String, IJavaMethod> globalMethods = new HashMap<>();
+
+    Map<String, IJavaMethod> globalGetters = new HashMap<>();
 
     public String getMcVersion() {
         return mcVersion;
@@ -83,5 +85,17 @@ public class ZSRCFile {
 
     public List<ZenType> getZenTypes() {
         return zenTypes;
+    }
+
+    public Map<String, String> getGlobalFields() {
+        return globalFields;
+    }
+
+    public Map<String, IJavaMethod> getGlobalMethods() {
+        return globalMethods;
+    }
+
+    public Map<String, IJavaMethod> getGlobalGetters() {
+        return globalGetters;
     }
 }

@@ -9,6 +9,7 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import stanhebben.zenscript.type.ZenType;
+import stanhebben.zenscript.type.natives.IJavaMethod;
 
 import java.lang.reflect.Type;
 
@@ -75,12 +76,22 @@ public class ZSRCSerializer implements JsonSerializer<ZSRCFile> {
         }
         zsrc.add("oredictionary", oreDictionary);
 
-        // CraftTweaker Registries
+        // ZenTypes
         JsonArray registries = new JsonArray();
         if (ProbeConfig.enableRegistries) {
             src.getZenTypes().forEach(zenType -> registries.add(context.serialize(zenType, ZenType.class)));
         }
         zsrc.add("registries", registries);
+
+        // CraftTweaker Globals
+        JsonObject globals = new JsonObject();
+        if (ProbeConfig.enableGlobals) {
+            src.getGlobalFields().forEach(globals::addProperty);
+            src.getGlobalMethods().forEach((key, value) -> globals.add(key, context.serialize(value, IJavaMethod.class)));
+            src.getGlobalGetters().forEach((key, value) -> globals.add(key, context.serialize(value, IJavaMethod.class)));
+        }
+        zsrc.add("globals", globals);
+
         return zsrc;
     }
 }

@@ -26,6 +26,9 @@ public class ProbeConfig {
     public static boolean enableRegistries = true;
 
     @Config.RequiresMcRestart
+    public static boolean enableGlobals = true;
+
+    @Config.RequiresMcRestart
     public static boolean setPrettyPrinting = false;
 
 }

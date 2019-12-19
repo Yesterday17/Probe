@@ -26,14 +26,14 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.versioning.ArtifactVersion;
 import net.minecraftforge.oredict.OreDictionary;
 import org.apache.logging.log4j.Logger;
-import stanhebben.zenscript.symbols.SymbolPackage;
-import stanhebben.zenscript.symbols.SymbolType;
+import stanhebben.zenscript.symbols.*;
 import stanhebben.zenscript.type.ZenType;
 import stanhebben.zenscript.type.natives.IJavaMethod;
 
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -107,8 +107,22 @@ public class Probe {
         // OreDictionary
         Collections.addAll(rcFile.OreDictionary, OreDictionary.getOreNames());
 
-        // Global Registries
+        // ZenTypes
         rcFile.zenTypes.addAll(getZenTypes(GlobalRegistry.getRoot()));
+
+        // CraftTweaker Globals
+        GlobalRegistry.getGlobals().forEach((key, value) -> {
+            if (value instanceof SymbolJavaStaticMethod) {
+                IJavaMethod r = (IJavaMethod) getField(SymbolJavaStaticMethod.class, value, "method");
+                rcFile.globalMethods.put(key, r);
+            } else if (value instanceof SymbolJavaStaticField) {
+                Field f = (Field) getField(SymbolJavaStaticField.class, value, "field");
+                rcFile.globalFields.put(key, f.getType().getName());
+            } else if (value instanceof SymbolJavaStaticGetter) {
+                IJavaMethod r = (IJavaMethod) getField(SymbolJavaStaticGetter.class, value, "method");
+                rcFile.globalGetters.put(key, r);
+            }
+        });
 
         // Write to .zsrc
         try {
@@ -140,5 +154,16 @@ public class Probe {
         });
 
         return result;
+    }
+
+    private static <T> Object getField(Class<T> cls, Object object, String key) {
+        try {
+            Field f = cls.getDeclaredField(key);
+            f.setAccessible(true);
+            return f.get(object);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
