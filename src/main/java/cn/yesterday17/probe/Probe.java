@@ -4,9 +4,9 @@ import cn.yesterday17.probe.serializer.*;
 import com.google.gson.GsonBuilder;
 import crafttweaker.zenscript.GlobalRegistry;
 import mezz.jei.Internal;
-import mezz.jei.gui.ingredients.IIngredientListElement;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.entity.EntityList;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeVersion;
@@ -34,9 +34,9 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
 public class Probe {
     static final String MOD_ID = "probe";
     static final String NAME = "Probe";
-    static final String VERSION = "0.1.22";
+    static final String VERSION = "@VERSION@";
 
     public static Logger logger;
     private static GsonBuilder gson = new GsonBuilder()
@@ -59,7 +59,7 @@ public class Probe {
             .registerTypeHierarchyAdapter(ResourceLocation.class, new ResourceLocationSerializer())
             .registerTypeHierarchyAdapter(CreativeTabs.class, new CreativeTabSerializer())
             .registerTypeHierarchyAdapter(ModContainer.class, new ModSerializer())
-            .registerTypeHierarchyAdapter(IIngredientListElement.class, new JEIItemSerializer())
+            .registerTypeHierarchyAdapter(ZSRCFile.JEIItem.class, new JEIItemSerializer())
             .registerTypeHierarchyAdapter(Enchantment.class, new EnchantmentSerializer())
             .registerTypeHierarchyAdapter(EntityEntry.class, new EntitySerializer())
             .registerTypeHierarchyAdapter(Fluid.class, new FluidSerializer())
@@ -81,39 +81,49 @@ public class Probe {
         rcFile.probeVersion = VERSION;
 
         // Mods
-        Loader.instance().getIndexedModList().forEach((modid, container) -> {
-            if (container instanceof FMLModContainer) {
-                rcFile.Mods.add(container);
-            }
-        });
+        rcFile.Mods = Loader.instance().getIndexedModList().values().stream()
+                .filter(s -> s instanceof FMLModContainer)
+                .sorted(Comparator.comparing(ModContainer::getModId))
+                .collect(Collectors.toList());
 
         // Items
         if (Internal.getRuntime() != null) {
-            Internal.getRuntime().getIngredientFilter().getIngredientList().forEach((element -> {
-                if (element.getIngredient() instanceof ItemStack) {
-                    rcFile.JEIItems.add(element);
-                }
-            }));
+            rcFile.JEIItems = Internal.getRuntime().getIngredientFilter().getIngredientList().stream()
+                    .filter(e -> e.getIngredient() instanceof ItemStack)
+                    .map(ZSRCFile.JEIItem::new)
+                    .sorted(Comparator.comparing(ZSRCFile.JEIItem::getSortName))
+                    .collect(Collectors.toList());
         }
 
         // Enchantments
-        rcFile.Enchantments.addAll(ForgeRegistries.ENCHANTMENTS.getValuesCollection());
+        rcFile.Enchantments = ForgeRegistries.ENCHANTMENTS.getValuesCollection().stream()
+                .sorted(Comparator.comparing(Enchantment::getName))
+                .collect(Collectors.toList());
 
         // Entities
-        rcFile.Entities.addAll(ForgeRegistries.ENTITIES.getValuesCollection());
+        rcFile.Entities = ForgeRegistries.ENTITIES.getValuesCollection().stream()
+                .sorted(Comparator.comparing(e -> EntityList.getID(e.getEntityClass())))
+                .collect(Collectors.toList());
 
         // Fluids
-        rcFile.Fluids.addAll(FluidRegistry.getRegisteredFluids().values());
+        rcFile.Fluids = FluidRegistry.getRegisteredFluids().values().stream()
+                .sorted(Comparator.comparing(f -> FluidRegistry.getRegisteredFluidIDs().get(f)))
+                .collect(Collectors.toList());
 
         // OreDictionary
-        Collections.addAll(rcFile.OreDictionary, OreDictionary.getOreNames());
+        rcFile.OreDictionary = Arrays.stream(OreDictionary.getOreNames())
+                .sorted()
+                .collect(Collectors.toList());
 
         // ZenType
-        rcFile.ZenType.addAll(GlobalRegistry.getTypes().getTypeMap().values().stream().map(ZenType::getName)
-                .filter(name -> !name.endsWith("?")).collect(Collectors.toCollection(HashSet::new)));
+        rcFile.ZenType = GlobalRegistry.getTypes().getTypeMap().values().stream()
+                .map(ZenType::getName)
+                .filter(name -> !name.endsWith("?"))
+                .sorted()
+                .collect(Collectors.toList());
 
         // ZenPackages
-        rcFile.ZenPackages.putAll(getZenTypes(GlobalRegistry.getRoot()));
+        rcFile.ZenPackages = getZenTypes(GlobalRegistry.getRoot());
 
         // CraftTweaker Globals
         GlobalRegistry.getGlobals().forEach((key, value) -> {
@@ -152,9 +162,20 @@ public class Probe {
         primer.getPackages().forEach((str, symbol) -> {
             if (symbol instanceof SymbolPackage) {
                 result.putAll(getZenTypes((SymbolPackage) symbol));
-            } else if (symbol instanceof SymbolType && ((SymbolType) symbol).getType() != null) {
-                SymbolType type = (SymbolType) symbol;
-                result.put(type.getType().getName(), type.getType());
+            } else if (symbol instanceof SymbolType || symbol instanceof ZenTypeNative) {
+                ZenTypeNative typeNative = null;
+                if (symbol instanceof SymbolType) {
+                    ZenType type = ((SymbolType) symbol).getType();
+                    if (type instanceof ZenTypeNative) {
+                        typeNative = (ZenTypeNative) type;
+                    }
+                } else {
+                    typeNative = (ZenTypeNative) symbol;
+                }
+
+                if (typeNative != null) {
+                    result.put(typeNative.getName(), typeNative);
+                }
             }
         });
 

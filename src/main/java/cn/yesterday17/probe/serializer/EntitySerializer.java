@@ -19,7 +19,7 @@ public class EntitySerializer implements JsonSerializer<EntityEntry> {
             entity.addProperty("id", EntityList.getID(src.getEntityClass()));
             entity.addProperty("name", src.getName());
             entity.add("resourceLocation", context.serialize(EntityList.getKey(src.getEntityClass())));
-            // TODO: Dump information about Spawn eggs here if necessary.
+            // Dump information about Spawn eggs here if necessary.
         } catch (Exception e) {
             Probe.logger.error("Failed serializing Entities!");
             Probe.logger.error(e, e);

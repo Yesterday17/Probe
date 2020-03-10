@@ -3,7 +3,6 @@ package cn.yesterday17.probe.serializer;
 import cn.yesterday17.probe.ProbeConfig;
 import cn.yesterday17.probe.ZSRCFile;
 import com.google.gson.*;
-import mezz.jei.gui.ingredients.IIngredientListElement;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.common.ModContainer;
@@ -44,7 +43,7 @@ public class ZSRCSerializer implements JsonSerializer<ZSRCFile> {
         // Items
         JsonArray items = new JsonArray();
         if (ProbeConfig.enableItems) {
-            src.getJEIItems().forEach(item -> items.add(context.serialize(item, IIngredientListElement.class)));
+            src.getJEIItems().forEach(item -> items.add(context.serialize(item, ZSRCFile.JEIItem.class)));
         }
         zsrc.add("items", items);
 

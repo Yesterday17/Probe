@@ -4,13 +4,17 @@ import cn.yesterday17.probe.serializer.ZSRCSerializer;
 import com.google.gson.annotations.JsonAdapter;
 import mezz.jei.gui.ingredients.IIngredientListElement;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import stanhebben.zenscript.type.ZenType;
 import stanhebben.zenscript.type.natives.IJavaMethod;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 @JsonAdapter(ZSRCSerializer.class)
 public class ZSRCFile {
@@ -18,19 +22,41 @@ public class ZSRCFile {
     String forgeVersion;
     String probeVersion;
 
-    Set<ModContainer> Mods = new HashSet<>();
+    List<ModContainer> Mods = new LinkedList<>();
 
-    List<IIngredientListElement> JEIItems = new ArrayList<>();
+    public static class JEIItem {
+        ItemStack stack;
+        IIngredientListElement ingredient;
 
-    Set<Enchantment> Enchantments = new HashSet<>();
+        JEIItem(IIngredientListElement i) {
+            this.ingredient = i;
+            this.stack = (ItemStack) i.getIngredient();
+        }
 
-    Set<EntityEntry> Entities = new HashSet<>();
+        public ItemStack getStack() {
+            return stack;
+        }
 
-    Set<Fluid> Fluids = new HashSet<>();
+        public IIngredientListElement getIngredient() {
+            return ingredient;
+        }
 
-    Set<String> OreDictionary = new HashSet<>();
+        public String getSortName() {
+            return ingredient.getModNameForSorting() + ingredient.getDisplayName();
+        }
+    }
 
-    Set<String> ZenType = new HashSet<>();
+    List<JEIItem> JEIItems = new LinkedList<>();
+
+    List<Enchantment> Enchantments = new LinkedList<>();
+
+    List<EntityEntry> Entities = new LinkedList<>();
+
+    List<Fluid> Fluids = new LinkedList<>();
+
+    List<String> OreDictionary = new LinkedList<>();
+
+    List<String> ZenType = new LinkedList<>();
 
     Map<String, ZenType> ZenPackages = new HashMap<>();
 
@@ -52,31 +78,31 @@ public class ZSRCFile {
         return probeVersion;
     }
 
-    public Set<ModContainer> getMods() {
+    public List<ModContainer> getMods() {
         return Mods;
     }
 
-    public List<IIngredientListElement> getJEIItems() {
+    public List<JEIItem> getJEIItems() {
         return JEIItems;
     }
 
-    public Set<Enchantment> getEnchantments() {
+    public List<Enchantment> getEnchantments() {
         return Enchantments;
     }
 
-    public Set<EntityEntry> getEntities() {
+    public List<EntityEntry> getEntities() {
         return Entities;
     }
 
-    public Set<Fluid> getFluids() {
+    public List<Fluid> getFluids() {
         return Fluids;
     }
 
-    public Set<String> getOreDictionary() {
+    public List<String> getOreDictionary() {
         return OreDictionary;
     }
 
-    public Set<String> getZenType() {
+    public List<String> getZenType() {
         return ZenType;
     }
 

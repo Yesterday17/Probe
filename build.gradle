@@ -24,6 +24,8 @@ minecraft {
     version = "${mc_version}-${forge_version}"
     runDir = "run"
     mappings = "snapshot_20171003"
+
+    replace '@VERSION@', project.version
 }
 
 repositories {
@@ -64,11 +66,11 @@ processResources {
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-                
+
         // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+        expand 'version': project.version, 'mcversion': project.minecraft.version
     }
-        
+
     // copy everything else except the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
