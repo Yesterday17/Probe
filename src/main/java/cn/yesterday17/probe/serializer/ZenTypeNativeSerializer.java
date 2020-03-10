@@ -1,4 +1,4 @@
-package cn.yesterday17.probe.serializer.CTRegistries;
+package cn.yesterday17.probe.serializer;
 
 import com.google.gson.*;
 import stanhebben.zenscript.type.ZenType;
@@ -9,30 +9,27 @@ import stanhebben.zenscript.type.natives.ZenNativeMember;
 import java.lang.reflect.Type;
 import java.util.function.BiConsumer;
 
-public class ZenTypeSerializer implements JsonSerializer<ZenType> {
+public class ZenTypeNativeSerializer implements JsonSerializer<ZenTypeNative> {
+
     @Override
-    public JsonElement serialize(ZenType src, Type typeOfSrc, JsonSerializationContext context) {
-        JsonObject zenType = new JsonObject();
-        zenType.addProperty("zsName", src.getName());
+    public JsonElement serialize(ZenTypeNative src, Type typeOfSrc, JsonSerializationContext context) {
+        JsonObject zenTypeNative = new JsonObject();
+        // Members
+        JsonObject membersJson = new JsonObject();
+        src.getMembers().forEach(getStringZenNativeMemberBiConsumer(context, membersJson));
+        zenTypeNative.add("members", membersJson);
 
-        if (src instanceof ZenTypeNative) {
-            JsonObject membersJson = new JsonObject();
+        // Static Members
+        membersJson = new JsonObject();
+        src.getStaticMembers().forEach(getStringZenNativeMemberBiConsumer(context, membersJson));
+        zenTypeNative.add("staticMembers", membersJson);
 
-            // Members
-            ((ZenTypeNative) src).getMembers().forEach(getStringZenNativeMemberBiConsumer(context, membersJson, false));
-
-            // Static Members
-            ((ZenTypeNative) src).getStaticMembers().forEach(getStringZenNativeMemberBiConsumer(context, membersJson, true));
-
-            zenType.add("members", membersJson);
-        }
-        return zenType;
+        return zenTypeNative;
     }
 
-    private BiConsumer<String, ZenNativeMember> getStringZenNativeMemberBiConsumer(JsonSerializationContext context, JsonObject members, boolean isStatic) {
+    private BiConsumer<String, ZenNativeMember> getStringZenNativeMemberBiConsumer(JsonSerializationContext context, JsonObject members) {
         return (name, member) -> {
             JsonObject memberJson = new JsonObject();
-            memberJson.addProperty("static", isStatic);
 
             // Get all callable of the method
             if (!member.getMethods().isEmpty()) {

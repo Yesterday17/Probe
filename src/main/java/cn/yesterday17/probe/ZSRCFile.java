@@ -4,7 +4,6 @@ import cn.yesterday17.probe.serializer.ZSRCSerializer;
 import com.google.gson.annotations.JsonAdapter;
 import mezz.jei.gui.ingredients.IIngredientListElement;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.item.Item;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.registry.EntityEntry;
@@ -23,9 +22,6 @@ public class ZSRCFile {
 
     List<IIngredientListElement> JEIItems = new ArrayList<>();
 
-    @Deprecated
-    Set<Item> Items = new HashSet<>();
-
     Set<Enchantment> Enchantments = new HashSet<>();
 
     Set<EntityEntry> Entities = new HashSet<>();
@@ -34,13 +30,15 @@ public class ZSRCFile {
 
     Set<String> OreDictionary = new HashSet<>();
 
-    List<ZenType> zenTypes = new ArrayList<>();
+    Set<String> ZenType = new HashSet<>();
 
-    Map<String, String> globalFields = new HashMap<>();
+    Map<String, ZenType> ZenPackages = new HashMap<>();
 
-    Map<String, IJavaMethod> globalMethods = new HashMap<>();
+    Map<String, String> GlobalFields = new HashMap<>();
 
-    Map<String, IJavaMethod> globalGetters = new HashMap<>();
+    Map<String, IJavaMethod> GlobalMethods = new HashMap<>();
+
+    Map<String, IJavaMethod> GlobalGetters = new HashMap<>();
 
     public String getMcVersion() {
         return mcVersion;
@@ -62,11 +60,6 @@ public class ZSRCFile {
         return JEIItems;
     }
 
-    @Deprecated
-    public Set<Item> getItems() {
-        return Items;
-    }
-
     public Set<Enchantment> getEnchantments() {
         return Enchantments;
     }
@@ -83,19 +76,23 @@ public class ZSRCFile {
         return OreDictionary;
     }
 
-    public List<ZenType> getZenTypes() {
-        return zenTypes;
+    public Set<String> getZenType() {
+        return ZenType;
+    }
+
+    public Map<String, ZenType> getZenPackages() {
+        return ZenPackages;
     }
 
     public Map<String, String> getGlobalFields() {
-        return globalFields;
+        return GlobalFields;
     }
 
     public Map<String, IJavaMethod> getGlobalMethods() {
-        return globalMethods;
+        return GlobalMethods;
     }
 
     public Map<String, IJavaMethod> getGlobalGetters() {
-        return globalGetters;
+        return GlobalGetters;
     }
 }

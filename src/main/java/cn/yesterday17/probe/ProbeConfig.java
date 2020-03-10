@@ -23,7 +23,10 @@ public class ProbeConfig {
     public static boolean enableOreDictionary = true;
 
     @Config.RequiresMcRestart
-    public static boolean enableRegistries = true;
+    public static boolean enableZenType = true;
+
+    @Config.RequiresMcRestart
+    public static boolean enableZenPackage = true;
 
     @Config.RequiresMcRestart
     public static boolean enableGlobals = true;

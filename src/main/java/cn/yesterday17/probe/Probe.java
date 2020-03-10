@@ -1,8 +1,6 @@
 package cn.yesterday17.probe;
 
 import cn.yesterday17.probe.serializer.*;
-import cn.yesterday17.probe.serializer.CTRegistries.MethodSerializer;
-import cn.yesterday17.probe.serializer.CTRegistries.ZenTypeSerializer;
 import com.google.gson.GsonBuilder;
 import crafttweaker.zenscript.GlobalRegistry;
 import mezz.jei.Internal;
@@ -28,6 +26,7 @@ import net.minecraftforge.oredict.OreDictionary;
 import org.apache.logging.log4j.Logger;
 import stanhebben.zenscript.symbols.*;
 import stanhebben.zenscript.type.ZenType;
+import stanhebben.zenscript.type.ZenTypeNative;
 import stanhebben.zenscript.type.natives.IJavaMethod;
 
 import java.io.BufferedWriter;
@@ -35,9 +34,11 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Mod(
         modid = Probe.MOD_ID,
@@ -62,8 +63,8 @@ public class Probe {
             .registerTypeHierarchyAdapter(Enchantment.class, new EnchantmentSerializer())
             .registerTypeHierarchyAdapter(EntityEntry.class, new EntitySerializer())
             .registerTypeHierarchyAdapter(Fluid.class, new FluidSerializer())
-            .registerTypeHierarchyAdapter(IJavaMethod.class, new MethodSerializer())
-            .registerTypeHierarchyAdapter(ZenType.class, new ZenTypeSerializer())
+            .registerTypeHierarchyAdapter(IJavaMethod.class, new IJavaMethodSerializer())
+            .registerTypeHierarchyAdapter(ZenTypeNative.class, new ZenTypeNativeSerializer())
 
             .serializeNulls();
     private static ZSRCFile rcFile = new ZSRCFile();
@@ -107,20 +108,24 @@ public class Probe {
         // OreDictionary
         Collections.addAll(rcFile.OreDictionary, OreDictionary.getOreNames());
 
-        // ZenTypes
-        rcFile.zenTypes.addAll(getZenTypes(GlobalRegistry.getRoot()));
+        // ZenType
+        rcFile.ZenType.addAll(GlobalRegistry.getTypes().getTypeMap().values().stream().map(ZenType::getName)
+                .filter(name -> !name.endsWith("?")).collect(Collectors.toCollection(HashSet::new)));
+
+        // ZenPackages
+        rcFile.ZenPackages.putAll(getZenTypes(GlobalRegistry.getRoot()));
 
         // CraftTweaker Globals
         GlobalRegistry.getGlobals().forEach((key, value) -> {
             if (value instanceof SymbolJavaStaticMethod) {
                 IJavaMethod r = (IJavaMethod) getField(SymbolJavaStaticMethod.class, value, "method");
-                rcFile.globalMethods.put(key, r);
+                rcFile.GlobalMethods.put(key, r);
             } else if (value instanceof SymbolJavaStaticField) {
                 Field f = (Field) getField(SymbolJavaStaticField.class, value, "field");
-                rcFile.globalFields.put(key, f.getType().getName());
+                rcFile.GlobalFields.put(key, f.getType().getName());
             } else if (value instanceof SymbolJavaStaticGetter) {
                 IJavaMethod r = (IJavaMethod) getField(SymbolJavaStaticGetter.class, value, "method");
-                rcFile.globalGetters.put(key, r);
+                rcFile.GlobalGetters.put(key, r);
             }
         });
 
@@ -138,18 +143,18 @@ public class Probe {
             logger.error("Probe met an error while loading! Please report to author about the problem!");
             logger.error(e, e);
         }
-
     }
 
 
-    private static List<ZenType> getZenTypes(SymbolPackage primer) {
-        List<ZenType> result = new ArrayList<>();
+    private static Map<String, ZenType> getZenTypes(SymbolPackage primer) {
+        Map<String, ZenType> result = new HashMap<>();
 
         primer.getPackages().forEach((str, symbol) -> {
             if (symbol instanceof SymbolPackage) {
-                result.addAll(getZenTypes((SymbolPackage) symbol));
+                result.putAll(getZenTypes((SymbolPackage) symbol));
             } else if (symbol instanceof SymbolType && ((SymbolType) symbol).getType() != null) {
-                result.add(((SymbolType) symbol).getType());
+                SymbolType type = (SymbolType) symbol;
+                result.put(type.getType().getName(), type.getType());
             }
         });
 

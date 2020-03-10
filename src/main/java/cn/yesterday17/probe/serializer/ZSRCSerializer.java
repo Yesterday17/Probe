@@ -8,7 +8,6 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.registry.EntityEntry;
-import stanhebben.zenscript.type.ZenType;
 import stanhebben.zenscript.type.natives.IJavaMethod;
 
 import java.lang.reflect.Type;
@@ -30,7 +29,9 @@ public class ZSRCSerializer implements JsonSerializer<ZSRCFile> {
         config.addProperty("entities", ProbeConfig.enableEntities);
         config.addProperty("fluids", ProbeConfig.enableFluids);
         config.addProperty("oredictionary", ProbeConfig.enableOreDictionary);
-        config.addProperty("registries", ProbeConfig.enableRegistries);
+        config.addProperty("zentype", ProbeConfig.enableZenType);
+        config.addProperty("zenpackage", ProbeConfig.enableZenPackage);
+        config.addProperty("globals", ProbeConfig.enableGlobals);
         zsrc.add("config", config);
 
         // Mods
@@ -43,7 +44,6 @@ public class ZSRCSerializer implements JsonSerializer<ZSRCFile> {
         // Items
         JsonArray items = new JsonArray();
         if (ProbeConfig.enableItems) {
-            // src.getItems().forEach(item -> items.add(context.serialize(item, Item.class)));
             src.getJEIItems().forEach(item -> items.add(context.serialize(item, IIngredientListElement.class)));
         }
         zsrc.add("items", items);
@@ -77,11 +77,17 @@ public class ZSRCSerializer implements JsonSerializer<ZSRCFile> {
         zsrc.add("oredictionary", oreDictionary);
 
         // ZenTypes
-        JsonArray registries = new JsonArray();
-        if (ProbeConfig.enableRegistries) {
-            src.getZenTypes().forEach(zenType -> registries.add(context.serialize(zenType, ZenType.class)));
+        JsonArray zenType = new JsonArray();
+        if (ProbeConfig.enableZenType) {
+            src.getZenType().forEach(t -> zenType.add(context.serialize(t, String.class)));
         }
-        zsrc.add("registries", registries);
+        zsrc.add("zentype", zenType);
+
+        JsonObject zenPackage = new JsonObject();
+        if (ProbeConfig.enableZenType) {
+            src.getZenPackages().forEach((name, type) -> zenPackage.add(name, context.serialize(type)));
+        }
+        zsrc.add("zenpackage", zenPackage);
 
         // CraftTweaker Globals
         JsonObject globals = new JsonObject();
