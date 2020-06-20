@@ -4,10 +4,13 @@ import cn.yesterday17.probe.serializer.*;
 import com.google.gson.GsonBuilder;
 import crafttweaker.zenscript.GlobalRegistry;
 import mezz.jei.Internal;
+import mezz.jei.gui.ingredients.IIngredientListElement;
+import mezz.jei.ingredients.IngredientFilter;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityList;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeVersion;
 import net.minecraftforge.fluids.Fluid;
@@ -88,11 +91,19 @@ public class Probe {
 
         // Items
         if (Internal.getRuntime() != null) {
-            rcFile.JEIItems = Internal.getRuntime().getIngredientFilter().getIngredientList().stream()
-                    .filter(e -> e.getIngredient() instanceof ItemStack)
-                    .map(ZSRCFile.JEIItem::new)
-                    .sorted(Comparator.comparing(ZSRCFile.JEIItem::getSortName))
-                    .collect(Collectors.toList());
+            IngredientFilter f = Internal.getRuntime().getIngredientFilter();
+            try {
+                Field field = f.getClass().getDeclaredField("elementList");
+                field.setAccessible(true);
+                NonNullList<IIngredientListElement> elementList = (NonNullList<IIngredientListElement>) field.get(f);
+                rcFile.JEIItems = elementList.stream()
+                        .filter(e -> e.getIngredient() instanceof ItemStack)
+                        .map(ZSRCFile.JEIItem::new)
+                        .sorted(Comparator.comparing(ZSRCFile.JEIItem::getSortName))
+                        .collect(Collectors.toList());
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
         }
 
         // Enchantments
